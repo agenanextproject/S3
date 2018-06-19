@@ -42,7 +42,8 @@
             "awsEndpoint": "s3.amazonaws.com",
             "bucketName": "multitester555",
             "bucketMatch": true,
-            "credentialsProfile": "default"
+            "credentialsProfile": "default",
+            "sizeLimitGB": 1
         }
     },
     "awsbackendhttp": {
@@ -66,16 +67,6 @@
             "credentialsProfile": "default"
         }
     },
-    "awsbackend2": {
-        "type": "aws_s3",
-        "legacyAwsBehavior": true,
-        "details": {
-            "awsEndpoint": "s3.amazonaws.com",
-            "bucketName": "multitester222",
-            "bucketMatch": true,
-            "credentialsProfile": "default_2"
-        }
-    },
     "awsbackendPathStyle": {
         "type": "aws_s3",
         "legacyAwsBehavior": true,
@@ -95,7 +86,8 @@
             "azureStorageAccountName": "fakeaccountname",
             "azureStorageAccessKey": "Fake00Key001",
             "bucketMatch": true,
-            "azureContainerName": "s3test"
+            "azureContainerName": "s3test",
+            "sizeLimitGB": 1
         }
     },
     "azurebackend2": {
@@ -140,17 +132,6 @@
             "mpuBucketName": "zenko-gcp-mpu",
             "bucketMatch": true,
             "credentialsProfile": "google"
-        }
-    },
-    "gcpbackend2": {
-        "type": "gcp",
-        "legacyAwsBehavior": true,
-        "details": {
-            "gcpEndpoint": "storage.googleapis.com",
-            "bucketName": "zenko-gcp-bucket-2",
-            "mpuBucketName": "zenko-gcp-mpu-2",
-            "bucketMatch": true,
-            "credentialsProfile": "google_2"
         }
     },
     "gcpbackendmismatch": {
