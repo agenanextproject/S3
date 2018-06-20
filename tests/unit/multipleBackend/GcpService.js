@@ -7,10 +7,10 @@ const httpPort = 8888;
 // test values
 const host = 'localhost:8888';
 const Bucket = 'testrequestbucket';
-const badBucket = 'testRequestBucket';
 const Key = 'testRequestKey';
 const MultipartUpload = { Parts: [{ PartName: 'part' }] };
 const CopySource = 'copyBucket/copyKey';
+
 
 function handler(isPathStyle) {
     return (req, res) => {
@@ -23,6 +23,24 @@ function handler(isPathStyle) {
         }
         res.end();
     };
+}
+
+const invalidBucketNames = [
+    '..',
+    '.bucketname',
+    'bucketname.',
+    'bucketName.',
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    '256.256.256.256',
+    '',
+];
+
+function badBucketNameHandler(req, res) {
+    assert(req.headers.host, host);
+    const bucketFromUrl = req.url.split('/')[1];
+    assert.strictEqual(typeof bucketFromUrl, 'string');
+    assert(invalidBucketNames.includes(bucketFromUrl));
+    res.end();
 }
 
 const operations = [
@@ -68,6 +86,42 @@ const operations = [
     },
 ];
 
+describe('GcpService request behavior', function testSuite() {
+    this.timeout(120000);
+    let httpServer;
+    let client;
+
+    before(done => {
+        client = new GCP({
+            endpoint: `http://${host}`,
+            maxRetries: 0,
+            s3ForcePathStyle: true,
+        });
+        httpServer =
+            http.createServer(badBucketNameHandler).listen(httpPort);
+        httpServer.on('listening', done);
+        httpServer.on('error', err => {
+            process.stdout.write(`https server: ${err.stack}\n`);
+            process.exit(1);
+        });
+    });
+
+    after('Terminating Server', () => {
+        httpServer.close();
+    });
+
+
+    invalidBucketNames.forEach(bucket => {
+        it(`should not use dns-style if bucket isn't dns compatible: ${bucket}`,
+        done => {
+            client.headBucket({ Bucket: bucket }, err => {
+                assert.ifError(err);
+                done();
+            });
+        });
+    });
+});
+
 describe('GcpService pathStyle tests', function testSuite() {
     this.timeout(120000);
     let httpServer;
@@ -98,14 +152,6 @@ describe('GcpService pathStyle tests', function testSuite() {
             done();
         });
     }));
-
-    it('should default to path style, if bucket name is not dns-compatible',
-    done => {
-        client.headBucket({ Bucket: badBucket }, err => {
-            assert.ifError(err);
-            done();
-        });
-    });
 });
 
 describe('GcpService dnsStyle tests', function testSuite() {
