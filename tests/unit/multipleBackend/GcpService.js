@@ -6,7 +6,8 @@ const httpPort = 8888;
 
 // test values
 const host = 'localhost:8888';
-const Bucket = 'testRequestBucket';
+const Bucket = 'testrequestbucket';
+const badBucket = 'testRequestBucket';
 const Key = 'testRequestKey';
 const MultipartUpload = { Parts: [{ PartName: 'part' }] };
 const CopySource = 'copyBucket/copyKey';
@@ -97,6 +98,14 @@ describe('GcpService pathStyle tests', function testSuite() {
             done();
         });
     }));
+
+    it('should default to path style, if bucket name is not dns-compatible',
+    done => {
+        client.headBucket({ Bucket: badBucket }, err => {
+            assert.ifError(err);
+            done();
+        });
+    });
 });
 
 describe('GcpService dnsStyle tests', function testSuite() {
