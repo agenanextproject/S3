@@ -10,7 +10,8 @@ const Bucket = 'testrequestbucket';
 const Key = 'testRequestKey';
 const MultipartUpload = { Parts: [{ PartName: 'part' }] };
 const CopySource = 'copyBucket/copyKey';
-
+const accessKeyId = 'accesskey';
+const secretAccessKey = 'secretaccesskey';
 
 function handler(isPathStyle) {
     return (req, res) => {
@@ -95,7 +96,9 @@ describe('GcpService request behavior', function testSuite() {
         client = new GCP({
             endpoint: `http://${host}`,
             maxRetries: 0,
-            s3ForcePathStyle: true,
+            s3ForcePathStyle: false,
+            accessKeyId,
+            secretAccessKey,
         });
         httpServer =
             http.createServer(badBucketNameHandler).listen(httpPort);
@@ -132,6 +135,8 @@ describe('GcpService pathStyle tests', function testSuite() {
             endpoint: `http://${host}`,
             maxRetries: 0,
             s3ForcePathStyle: true,
+            accessKeyId,
+            secretAccessKey,
         });
         httpServer =
             http.createServer(handler(true)).listen(httpPort);
@@ -164,6 +169,8 @@ describe('GcpService dnsStyle tests', function testSuite() {
             endpoint: `http://localhost:${httpPort}`,
             maxRetries: 0,
             s3ForcePathStyle: false,
+            accessKeyId,
+            secretAccessKey,
         });
         httpServer =
             http.createServer(handler(false)).listen(httpPort);
